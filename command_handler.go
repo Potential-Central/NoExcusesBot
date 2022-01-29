@@ -21,7 +21,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else if strings.HasPrefix(m.Content, "!adminchan") {
 			cmdAdminChan(s, m)
 			return
-		} else if strings.HasPrefix(m.Content, "!adminrole") {
+		} else if strings.HasPrefix(m.Content, "!adminrole ") {
 			cmdAdminRole(s, m)
 			return
 		}
@@ -68,7 +68,7 @@ func cmdAdminChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		//If guild doesn't exist, create new guild
 		newGuild := Guild{
-			Id:          intG,
+			Id:           intG,
 			AdminChannel: intCh,
 		}
 		guilds[intG] = newGuild
@@ -79,5 +79,29 @@ func cmdAdminChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 //Setting a role for bot administrators
 func cmdAdminRole(s *discordgo.Session, m *discordgo.MessageCreate) {
-
+	roles := m.MentionRoles
+	intG, _ := strconv.Atoi(m.GuildID)
+	if len(roles) != 1 {
+		s.ChannelMessageSend(m.ChannelID, "Please provide exactly **one** role!")
+		return
+	}
+	intR, _ := strconv.Atoi(roles[0])
+	if guild, ok := guilds[intG]; ok {
+		//If guild already exists, just update the role.
+		guild.AdminRole = intR
+		guilds[intG] = guild
+		updateGuild(intG)
+		logger.Printf("[CMD] Updated admin role in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "Admin role successfully updated!")
+	} else {
+		//If guild doesn't exist, create new guild
+		newGuild := Guild{
+			Id:        intG,
+			AdminRole: intR,
+		}
+		guilds[intG] = newGuild
+		createGuild(intG)
+		logger.Printf("[CMD] Created admin role in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "Admin role successfully created!")
+	}
 }
