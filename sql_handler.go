@@ -85,7 +85,6 @@ func updateGuild(guildId int) {
 	if err != nil {
 		logger.Fatalf("[CMD] Could not update guild: %v", err)
 	}
-	logger.Printf("[CND] Updated guild %v", guildId)
 }
 
 //Create new guild
@@ -99,5 +98,4 @@ func createGuild(guildId int) {
 	if err != nil {
 		logger.Fatalf("[CMD] Could not create guild: %v", err)
 	}
-	logger.Printf("[CND] Created guild %v", guildId)
 }
