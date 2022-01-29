@@ -41,8 +41,7 @@ func cmdUserChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//If guild already exists, just update the channel.
 		guild.UserChannel = intCh
 		guilds[intG] = guild
-		logger.Println("Updating guild")
-		//updateGuild(m.GuildID)
+		updateGuild(intG)
 	} else {
 		//If guild doesn't exist, create new guild
 		newGuild := Guild{
@@ -50,8 +49,7 @@ func cmdUserChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 			UserChannel: intCh,
 		}
 		guilds[intG] = newGuild
-		logger.Println("Creating new guild")
-		//createGuild(newGuild)
+		createGuild(intG)
 	}
 }
 

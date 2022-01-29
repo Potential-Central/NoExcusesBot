@@ -7,6 +7,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+const sqlUpdateGuildQuery = `
+	UPDATE guilds 
+	SET adminrole = $1, userchan = $2, adminchan = $3
+	WHERE guildid = $4`
+const sqlInsertGuildQuery = `
+	INSERT INTO guilds (guildid, adminrole, userchan, adminchan)
+	VALUES ($1, $2, $3, $4)`
+
 type Guild struct {
 	Id           int
 	AdminRole    int
@@ -64,4 +72,32 @@ func getGuilds() {
 		}
 		guilds[g.Id] = g
 	}
+}
+
+//Updates guild to new info
+func updateGuild(guildId int) {
+	guild, _ := guilds[guildId]
+	_, err := database.Exec(sqlUpdateGuildQuery,
+		guild.AdminRole,
+		guild.UserChannel,
+		guild.AdminChannel,
+		guildId)
+	if err != nil {
+		logger.Fatalf("[CMD] Could not update guild: %v", err)
+	}
+	logger.Printf("[CND] Updated guild %v", guildId)
+}
+
+//Create new guild
+func createGuild(guildId int) {
+	guild, _ := guilds[guildId]
+	_, err := database.Exec(sqlInsertGuildQuery,
+		guildId,
+		guild.AdminRole,
+		guild.UserChannel,
+		guild.AdminChannel)
+	if err != nil {
+		logger.Fatalf("[CMD] Could not create guild: %v", err)
+	}
+	logger.Printf("[CND] Created guild %v", guildId)
 }
