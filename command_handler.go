@@ -43,6 +43,7 @@ func cmdUserChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 		guilds[intG] = guild
 		updateGuild(intG)
 		logger.Printf("[CMD] Updated user channel in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "This channel is now the reminder channel!")
 	} else {
 		//If guild doesn't exist, create new guild
 		newGuild := Guild{
@@ -52,6 +53,7 @@ func cmdUserChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 		guilds[intG] = newGuild
 		createGuild(intG)
 		logger.Printf("[CMD] Created user channel in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "This channel is now the reminder channel!")
 	}
 }
 
@@ -65,6 +67,7 @@ func cmdAdminChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 		guilds[intG] = guild
 		updateGuild(intG)
 		logger.Printf("[CMD] Updated admin channel in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "This channel is now an admin channel!")
 	} else {
 		//If guild doesn't exist, create new guild
 		newGuild := Guild{
@@ -74,6 +77,7 @@ func cmdAdminChan(s *discordgo.Session, m *discordgo.MessageCreate) {
 		guilds[intG] = newGuild
 		createGuild(intG)
 		logger.Printf("[CMD] Created admin channel in guild %v", intG)
+		s.ChannelMessageSend(m.ChannelID, "This channel is now an admin channel!")
 	}
 }
 
