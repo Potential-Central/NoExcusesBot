@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
-    "log"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -11,9 +13,11 @@ import (
 )
 
 var (
-	logger *log.Logger
+	logger   *log.Logger
 	database *sql.DB
-	client *discordgo.Session
+	client   *discordgo.Session
+	tasks    map[int]Task
+	guilds   map[int]Guild
 )
 
 func init() {
@@ -21,13 +25,9 @@ func init() {
 	err := godotenv.Load()
 	if err != nil {
 		logger.Fatal("[SETUP] Error loading .env file")
-  	}
-	database, _ = sql.Open("sqlite3", "tasks.db")
-	dat, err := os.ReadFile("queries/createTables.sql")
-	if err != nil {
-		logger.Fatal("[SETUP] Error creating SQL tables")
 	}
-	database.Exec(string(dat))
+	createDatabase()
+	getGuilds()
 }
 
 func main() {
@@ -37,4 +37,24 @@ func main() {
 		logger.Fatal("[SETUP] Error opening connection,", err)
 	}
 	client.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMembers | discordgo.IntentsGuildMessages
+
+	//Commands handler
+	client.AddHandler(messageHandler)
+
+	//Guild join handler
+	client.AddHandler(guildJoinHandler)
+
+	err = client.Open()
+	if err != nil {
+		logger.Fatal("[SETUP] Error opening connection,", err)
+	}
+
+	logger.Println("[SETUP] Now running.  Press CTRL-C to exit.")
+	//Gracefully close from console
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
+	logger.Println("[SETUP] Shutting down...")
+	client.Close()
 }
