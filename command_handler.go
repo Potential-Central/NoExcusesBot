@@ -1,9 +1,12 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 //Handles messages
@@ -136,5 +139,6 @@ func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 //Returns current time in UTC
 func cmdClock(s *discordgo.Session, m *discordgo.MessageCreate) {
-	logger.Println("[CMD] Time incoked!")
+	cur := time.Now().UTC()
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current time is **%s**", cur.Format("15:04")))
 }
