@@ -1,10 +1,25 @@
 package main
 
 import (
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
+
+var (
+	timeRegex     *regexp.Regexp
+	intervalRegex *regexp.Regexp
+	repeatsRegex  *regexp.Regexp
+)
+
+//Compiles regexes when starting the bot
+func CompileRegex() {
+	timeRegex, _ = regexp.Compile("\\d{1,2}:\\d{1,2}")
+	intervalRegex, _ = regexp.Compile("(\\d{1,2}[dwh])+")
+	repeatsRegex, _ = regexp.Compile("\\s\\d{1,3}\\s")
+}
 
 //Checks whether message author has administrator permissions
 func IsAdmin(s *discordgo.Session, m *discordgo.MessageCreate) (bool, error) {
@@ -35,4 +50,15 @@ func IsAdmin(s *discordgo.Session, m *discordgo.MessageCreate) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+//Recieves arguments from a discord message
+//Returns a Task according to given params
+func ParseTaskArgs(arguments string) {
+	//Parsing command
+	msg := strings.Split(arguments, " ")[4:]
+	logger.Println("MSG: ", msg)
+	logger.Println("Time: ", timeRegex.FindString(arguments))
+	logger.Println("Interval: ", intervalRegex.FindString(arguments))
+	logger.Println("Repeats: ", repeatsRegex.FindString(arguments))
 }

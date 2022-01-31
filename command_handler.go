@@ -134,7 +134,12 @@ func cmdAdminRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 //Command format: !newtask starttime interval repeats message
 //Command example: !newtask 15:00 1d 1 Did you remember to plant your radishes?
 func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
-	logger.Println("[CMD] New task invoked!")
+	if len(strings.Split(m.Content, " ")) < 5 {
+		logger.Printf("[CMD] Invalid task creation %v", m.Content)
+		s.ChannelMessageSend(m.ChannelID, "`Invalid task creation! Use the format: !newtask starttime interval repeats message`")
+		return
+	}
+	ParseTaskArgs(m.Content)
 }
 
 //Returns current time in UTC
