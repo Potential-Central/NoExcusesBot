@@ -21,9 +21,26 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else if strings.HasPrefix(m.Content, "!adminchan") {
 			cmdAdminChan(s, m)
 			return
-		} else if strings.HasPrefix(m.Content, "!adminrole ") {
+		} else if strings.HasPrefix(m.Content, "!adminrole") {
 			cmdAdminRole(s, m)
 			return
+		}
+	}
+	//User commands
+	intG, _ := strconv.Atoi(m.GuildID)
+	if guild, ok := guilds[intG]; ok {
+		intC, _ := strconv.Atoi(m.ChannelID)
+		if intC == guild.UserChannel || intC == guild.AdminChannel {
+			if strings.HasPrefix(m.Content, "!newtask") {
+				cmdNewTask(s, m)
+				return
+			} else if strings.HasPrefix(m.Content, "!clock") {
+				cmdClock(s, m)
+				return
+			} else if strings.HasPrefix(m.Content, "!time") {
+				cmdClock(s, m)
+				return
+			}
 		}
 	}
 }
@@ -108,4 +125,16 @@ func cmdAdminRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 		logger.Printf("[CMD] Created admin role in guild %v", intG)
 		s.ChannelMessageSend(m.ChannelID, "Admin role successfully created!")
 	}
+}
+
+//Creating a new task
+//Command format: !newtask starttime interval repeats message
+//Command example: !newtask 15:00 1d 1 Did you remember to plant your radishes?
+func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
+	logger.Println("[CMD] New task invoked!")
+}
+
+//Returns current time in UTC
+func cmdClock(s *discordgo.Session, m *discordgo.MessageCreate) {
+	logger.Println("[CMD] Time incoked!")
 }
