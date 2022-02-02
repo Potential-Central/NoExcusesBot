@@ -134,19 +134,29 @@ func cmdAdminRole(s *discordgo.Session, m *discordgo.MessageCreate) {
 //Command format: !newtask starttime interval repeats message
 //Command example: !newtask 15:00 1d 1 Did you remember to plant your radishes?
 func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
+	//Making sure we have enough arguments
 	if len(strings.Split(m.Content, " ")) < 5 {
 		logger.Printf("[CMD] Invalid task creation %v", m.Content)
 		s.ChannelMessageSend(m.ChannelID, "`Invalid task creation! Use the format: !newtask starttime interval repeats message`")
 		return
 	}
+	//Parsing
 	task, err := ParseTaskArgs(m.Content)
 	if err != nil {
 		logger.Printf("[CMD] Invalid task creation %v", m.Content)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%v`", err))
 		return
 	}
+	task.User, _ = strconv.Atoi(m.Author.ID)
+	task.Guild, _ = strconv.Atoi(m.GuildID)
 	embed := TaskToEmbed(task)
-	s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS:false,})
+	_, err = s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS: false})
+	if err != nil {
+		logger.Printf("[CMD] Error sending task: %v", err)
+		return
+	}
+	//Appending task to pending, waiting for it to be confirmed via !confirm
+	pendingTasks[task.User] = task
 }
 
 //Returns current time in UTC
