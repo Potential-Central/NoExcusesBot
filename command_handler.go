@@ -145,7 +145,8 @@ func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%v`", err))
 		return
 	}
-	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v", task))
+	embed := TaskToEmbed(task)
+	s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS:false,})
 }
 
 //Returns current time in UTC
