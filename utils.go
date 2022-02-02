@@ -69,7 +69,7 @@ func ParseTaskArgs(arguments string) (Task, error) {
 	}
 	//Geting interval of reminders in the 1w2d3h format
 	intervalArg, err := str2duration.ParseDuration(intervalRegex.FindString(arguments))
-	if err != nil  || intervalArg <= time.Hour * 1{
+	if err != nil || intervalArg <= time.Hour*1 {
 		return Task{}, errors.New("Error with interval; Please only use (h)ours (d)ays and (w)eeks. Must be more than 1 hour.")
 	}
 	//Getting number of repeats
@@ -93,27 +93,27 @@ func ParseTaskArgs(arguments string) (Task, error) {
 //Recieves a task and constructs an embed for it
 //TODO: make this less ugly...
 func TaskToEmbed(t Task) discordgo.MessageEmbed {
-	nxt := time.Unix(int64(t.NextReminder),0).UTC().Format("02-01-2006 15:04")
-	nxtDiff := int(time.Unix(int64(t.NextReminder),0).UTC().Sub(time.Now().UTC()).Hours())
+	nxt := time.Unix(int64(t.NextReminder), 0).UTC().Format("02-01-2006 15:04")
+	nxtDiff := int(time.Unix(int64(t.NextReminder), 0).UTC().Sub(time.Now().UTC()).Hours())
 	embed := discordgo.MessageEmbed{
-		Title: "Task Creation",
-		Description: "Type **!confirm** to create this task, or **!cancel** to cancel",
-		Color: 16106050,
+		Title:       "Task Creation",
+		Description: "Type **!confirm** to create this task",
+		Color:       16106050,
 		Fields: []*discordgo.MessageEmbedField{
-			&discordgo.MessageEmbedField{
-				Name: "Next Reminder",
+			{
+				Name:  "Next Reminder",
 				Value: fmt.Sprintf("%s (in %v hours)", nxt, nxtDiff),
 			},
-			&discordgo.MessageEmbedField{
-				Name: "Interval",
-				Value: (time.Duration(t.Interval)*time.Second).String(),
+			{
+				Name:  "Interval",
+				Value: (time.Duration(t.Interval) * time.Second).String(),
 			},
-			&discordgo.MessageEmbedField{
-				Name: "Repeats",
+			{
+				Name:  "Repeats",
 				Value: fmt.Sprintf("Repeats %v times", t.Repeats),
 			},
-			&discordgo.MessageEmbedField{
-				Name: "Message",
+			{
+				Name:  "Message",
 				Value: t.Message,
 			},
 		},

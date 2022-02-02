@@ -13,11 +13,12 @@ import (
 )
 
 var (
-	logger   *log.Logger
-	database *sql.DB
-	client   *discordgo.Session
-	tasks    map[int]Task
-	guilds   map[int]Guild
+	logger       *log.Logger
+	database     *sql.DB
+	client       *discordgo.Session
+	tasks        map[int]Task  //TaskID  -> Task
+	guilds       map[int]Guild //GuildID -> Guild
+	pendingTasks map[int]Task  //UserID  -> Task
 )
 
 func init() {
