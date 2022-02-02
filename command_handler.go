@@ -139,7 +139,13 @@ func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "`Invalid task creation! Use the format: !newtask starttime interval repeats message`")
 		return
 	}
-	ParseTaskArgs(m.Content)
+	task, err := ParseTaskArgs(m.Content)
+	if err != nil {
+		logger.Printf("[CMD] Invalid task creation %v", m.Content)
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%v`", err))
+		return
+	}
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v", task))
 }
 
 //Returns current time in UTC
