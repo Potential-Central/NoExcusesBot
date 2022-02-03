@@ -215,7 +215,7 @@ func cmdHelp(s *discordgo.Session, m *discordgo.MessageCreate) {
 				logger.Printf("[CMD] Error sending help: %v", err)
 			}
 		} else {
-			_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Did not find the subject %s :( Try `!help` to see all commands available.", keyword))
+			_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Did not find the subject `%s` :( Try `!help` to see all commands available.", keyword))
 			if err != nil {
 				logger.Printf("[CMD] Error sending help: %v", err)
 			}
