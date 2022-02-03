@@ -37,6 +37,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if strings.HasPrefix(m.Content, "!newtask") {
 				cmdNewTask(s, m)
 				return
+			} else if strings.HasPrefix(m.Content, "!confirm") {
+				cmdTaskConfirm(s, m)
+				return
 			} else if strings.HasPrefix(m.Content, "!clock") {
 				cmdClock(s, m)
 				return
@@ -149,7 +152,7 @@ func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	task.User, _ = strconv.Atoi(m.Author.ID)
 	task.Guild, _ = strconv.Atoi(m.GuildID)
-	embed := TaskToEmbed(task)
+	embed := TaskToEmbed(task, "Task Creation", "Type **!confirm** to create this task", 16106050)
 	_, err = s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS: false})
 	if err != nil {
 		logger.Printf("[CMD] Error sending task: %v", err)
@@ -157,6 +160,21 @@ func cmdNewTask(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	//Appending task to pending, waiting for it to be confirmed via !confirm
 	pendingTasks[task.User] = task
+}
+
+//Confirms a pending task, submits it to database
+func cmdTaskConfirm(s *discordgo.Session, m *discordgo.MessageCreate) {
+	userid, _ := strconv.Atoi(m.Author.ID)
+	//Checking if user has a pending task
+	if task, ok := pendingTasks[userid]; ok {
+		task.Id = insertNewTask(task)
+		embed := TaskToEmbed(task, fmt.Sprintf("Task **%v** successfully created!", task.Id), "", 261131)
+		_, err := s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS: false})
+		if err != nil {
+			logger.Printf("[CMD] Error sending task: %v", err)
+			return
+		}
+	}
 }
 
 //Returns current time in UTC

@@ -29,6 +29,7 @@ func init() {
 	}
 	createDatabase()
 	getGuilds()
+	getTasks()
 	CompileRegex()
 }
 

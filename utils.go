@@ -92,13 +92,13 @@ func ParseTaskArgs(arguments string) (Task, error) {
 
 //Recieves a task and constructs an embed for it
 //TODO: make this less ugly...
-func TaskToEmbed(t Task) discordgo.MessageEmbed {
+func TaskToEmbed(t Task, title, desc string, color int) discordgo.MessageEmbed {
 	nxt := time.Unix(int64(t.NextReminder), 0).UTC().Format("02-01-2006 15:04")
 	nxtDiff := int(time.Unix(int64(t.NextReminder), 0).UTC().Sub(time.Now().UTC()).Hours())
 	embed := discordgo.MessageEmbed{
-		Title:       "Task Creation",
-		Description: "Type **!confirm** to create this task",
-		Color:       16106050,
+		Title:       title,
+		Description: desc,
+		Color:       color,
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:  "Next Reminder",
