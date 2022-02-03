@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/go-co-op/gocron"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -37,6 +39,13 @@ func init() {
 
 func main() {
 	defer database.Close()
+
+	//Making task handler
+	tz, _ := time.LoadLocation("UTC")
+	scheduler := gocron.NewScheduler(tz)
+	scheduler.Every("3m").SingletonMode().Do(CheckTasks)
+
+	//Making discord client
 	client, err := discordgo.New("Bot " + os.Getenv("DISCORD_TOKEN"))
 	if err != nil {
 		logger.Fatal("[SETUP] Error opening connection,", err)
