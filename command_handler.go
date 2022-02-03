@@ -46,7 +46,11 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			} else if strings.HasPrefix(m.Content, "!time") {
 				cmdClock(s, m)
 				return
+			} else if strings.HasPrefix(m.Content, "!help") {
+				cmdHelp(s, m)
+				return
 			}
+
 		}
 	}
 }
@@ -181,4 +185,40 @@ func cmdTaskConfirm(s *discordgo.Session, m *discordgo.MessageCreate) {
 func cmdClock(s *discordgo.Session, m *discordgo.MessageCreate) {
 	cur := time.Now().UTC()
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("The current time is **%s**", cur.Format("15:04")))
+}
+
+//Prints help about given command
+func cmdHelp(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if seperated := strings.Split(m.Content, " "); len(seperated) == 1 {
+		//Main help page
+		embed, _ := help["help"]
+		embed.Fields = make([]*discordgo.MessageEmbedField, 0, len(help))
+		for k, v := range help {
+			if k != "help" {
+				embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+					Name:   fmt.Sprintf("!%s", k),
+					Value:  v.Description,
+					Inline: false,
+				})
+			}
+		}
+		_, err := s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS: false})
+		if err != nil {
+			logger.Printf("[CMD] Error sending help: %v", err)
+		}
+	} else if len(seperated) >= 2 {
+		//Help for specific command
+		keyword := strings.ToLower(strings.Replace(seperated[1], "!", "", 1))
+		if embed, ok := help[keyword]; ok {
+			_, err := s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{Embed: &embed, TTS: false})
+			if err != nil {
+				logger.Printf("[CMD] Error sending help: %v", err)
+			}
+		} else {
+			_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Did not find the subject %s :( Try `!help` to see all commands available.", keyword))
+			if err != nil {
+				logger.Printf("[CMD] Error sending help: %v", err)
+			}
+		}
+	}
 }

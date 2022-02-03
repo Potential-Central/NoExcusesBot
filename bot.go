@@ -19,6 +19,7 @@ var (
 	tasks        map[int]Task  //TaskID  -> Task
 	guilds       map[int]Guild //GuildID -> Guild
 	pendingTasks map[int]Task  //UserID  -> Task
+	help         map[string]discordgo.MessageEmbed
 )
 
 func init() {
@@ -30,6 +31,7 @@ func init() {
 	createDatabase()
 	getGuilds()
 	getTasks()
+	GetHelp()
 	CompileRegex()
 }
 

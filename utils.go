@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,6 +20,18 @@ var (
 	intervalRegex *regexp.Regexp
 	repeatsRegex  *regexp.Regexp
 )
+
+//Seriously, get help
+func GetHelp() {
+	help = make(map[string]discordgo.MessageEmbed)
+	jsonFile, err := os.Open("help.json")
+	if err != nil {
+		return
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal(byteValue, &help)
+}
 
 //Compiles regexes when starting the bot
 func CompileRegex() {
