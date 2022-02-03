@@ -14,6 +14,9 @@ const sqlUpdateGuildQuery = `
 const sqlInsertGuildQuery = `
 	INSERT INTO guilds (guildid, adminrole, userchan, adminchan)
 	VALUES ($1, $2, $3, $4)`
+const sqlInsertTaskQuery = `
+	INSERT INTO tasks (userid, guild, nextreminder, interval, repeats, message)
+	VALUES ($1, $2, $3, $4, $5, $6)`
 
 type Guild struct {
 	Id           int
@@ -45,6 +48,7 @@ func createDatabase() {
 //Get tasks from database
 func getTasks() {
 	tasks = make(map[int]Task)
+	pendingTasks = make(map[int]Task)
 	rows, err := database.Query("SELECT * FROM tasks")
 	if err != nil {
 		logger.Fatal("[SETUP] Error reading tasks from DB")
@@ -98,4 +102,25 @@ func createGuild(guildId int) {
 	if err != nil {
 		logger.Fatalf("[CMD] Could not create guild: %v", err)
 	}
+}
+
+//Inserts a new task into the Database
+func insertNewTask(t Task) int {
+	res, err := database.Exec(sqlInsertTaskQuery,
+		t.User,
+		t.Guild,
+		t.NextReminder,
+		t.Interval,
+		t.Repeats,
+		t.Message)
+	if err != nil {
+		logger.Fatalf("[CMD] Could not create task: %v", err)
+	}
+	inserted, _ := res.LastInsertId()
+	//Removing task from pending
+	delete(pendingTasks, t.User)
+	//Adding to internal task list
+	t.Id = int(inserted)
+	tasks[t.Id] = t
+	return t.Id
 }
