@@ -63,6 +63,9 @@ func main() {
 		logger.Fatal("[SETUP] Error opening connection,", err)
 	}
 
+	//Starting tasks
+	scheduler.StartAsync()
+
 	logger.Println("[SETUP] Now running.  Press CTRL-C to exit.")
 	//Gracefully close from console
 	sc := make(chan os.Signal, 1)
@@ -71,4 +74,5 @@ func main() {
 
 	logger.Println("[SETUP] Shutting down...")
 	client.Close()
+	scheduler.Stop()
 }
