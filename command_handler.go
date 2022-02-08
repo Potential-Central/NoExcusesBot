@@ -179,6 +179,7 @@ func cmdTaskConfirm(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	}
+	logger.Printf("[CMD] Created task: %v", m.Content)
 }
 
 //Returns current time in UTC

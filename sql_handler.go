@@ -17,6 +17,13 @@ const sqlInsertGuildQuery = `
 const sqlInsertTaskQuery = `
 	INSERT INTO tasks (userid, guild, nextreminder, interval, repeats, message)
 	VALUES ($1, $2, $3, $4, $5, $6)`
+const sqlDeleteTaskQuery = `
+	DELETE FROM tasks
+	WHERE taskid = $1`
+const sqlUpdateTaskQuery = `
+	UPDATE tasks
+	SET nextreminder = $1, interval = $2, repeats = $3, message = $4
+	WHERE taskid = $5`
 
 type Guild struct {
 	Id           int
@@ -123,4 +130,31 @@ func insertNewTask(t Task) int {
 	t.Id = int(inserted)
 	tasks[t.Id] = t
 	return t.Id
+}
+
+//Deletes a task
+func deleteTask(t Task) {
+	//Deleting from DB
+	_, err := database.Exec(sqlDeleteTaskQuery, t.Id)
+	if err != nil {
+		logger.Fatalf("[CMD] Could not delete task: %v", err)
+	}
+	//Deleting from memory
+	delete(tasks, t.Id)
+}
+
+//Updates a task
+func updateTask(t Task) {
+	//Updating in DB
+	_, err := database.Exec(sqlUpdateTaskQuery,
+		t.NextReminder,
+		t.Interval,
+		t.Repeats,
+		t.Message,
+		t.Id)
+	if err != nil {
+		logger.Fatalf("[CMD] Could not update task: %v", err)
+	}
+	//Updating in memory
+	tasks[t.Id] = t
 }
