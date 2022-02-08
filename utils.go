@@ -110,6 +110,12 @@ func ParseTaskArgs(arguments string) (Task, error) {
 func TaskToEmbed(t Task, title, desc string, color int) discordgo.MessageEmbed {
 	nxt := time.Unix(int64(t.NextReminder), 0).UTC().Format("02-01-2006 15:04")
 	nxtDiff := int(time.Unix(int64(t.NextReminder), 0).UTC().Sub(time.Now().UTC()).Hours())
+	repeatTxt := fmt.Sprintf("Repeats %v times", t.Repeats)
+	nextTxt := fmt.Sprintf("%s (in %v hours)", nxt, nxtDiff)
+	if t.Repeats == 0 {
+		repeatTxt = "No more repeats"
+		nextTxt = "No more reminders"
+	}
 	embed := discordgo.MessageEmbed{
 		Title:       title,
 		Description: desc,
@@ -117,7 +123,7 @@ func TaskToEmbed(t Task, title, desc string, color int) discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:  "Next Reminder",
-				Value: fmt.Sprintf("%s (in %v hours)", nxt, nxtDiff),
+				Value: repeatTxt,
 			},
 			{
 				Name:  "Interval",
@@ -125,7 +131,7 @@ func TaskToEmbed(t Task, title, desc string, color int) discordgo.MessageEmbed {
 			},
 			{
 				Name:  "Repeats",
-				Value: fmt.Sprintf("Repeats %v times", t.Repeats),
+				Value: nextTxt,
 			},
 			{
 				Name:  "Message",
