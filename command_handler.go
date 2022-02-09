@@ -192,7 +192,7 @@ func cmdClock(s *discordgo.Session, m *discordgo.MessageCreate) {
 func cmdHelp(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if seperated := strings.Split(m.Content, " "); len(seperated) == 1 {
 		//Main help page
-		embed, _ := help["help"]
+		embed := help["help"]
 		embed.Fields = make([]*discordgo.MessageEmbedField, 0, len(help))
 		for k, v := range help {
 			if k != "help" {

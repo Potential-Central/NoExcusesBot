@@ -35,9 +35,9 @@ func GetHelp() {
 
 //Compiles regexes when starting the bot
 func CompileRegex() {
-	timeRegex, _ = regexp.Compile("\\d{1,2}:\\d{1,2}")
-	intervalRegex, _ = regexp.Compile("([\\d\\.]{1,3}[dwh])+")
-	repeatsRegex, _ = regexp.Compile("\\s\\d{1,3}\\s")
+	timeRegex, _ = regexp.Compile(`\d{1,2}:\d{1,2}`)
+	intervalRegex, _ = regexp.Compile(`([\d\.]{1,3}[dwh])+`)
+	repeatsRegex, _ = regexp.Compile(`\s\d{1,3}\s`)
 }
 
 //Checks whether message author has administrator permissions
@@ -80,17 +80,17 @@ func ParseTaskArgs(arguments string) (Task, error) {
 	//Getting time in the HH:MM format
 	timeArg, err := time.Parse("15:04", timeRegex.FindString(arguments))
 	if err != nil {
-		return Task{}, errors.New("Time format not recognized; Use 24:00 format.")
+		return Task{}, errors.New("time format not recognized; use 24:00 format")
 	}
 	//Geting interval of reminders in the 1w2d3h format
 	intervalArg, err := str2duration.ParseDuration(intervalRegex.FindString(arguments))
 	if err != nil || intervalArg <= time.Hour*1 {
-		return Task{}, errors.New("Error with interval; Please only use (h)ours (d)ays and (w)eeks. Must be more than 1 hour.")
+		return Task{}, errors.New("error with interval; please only use (h)ours (d)ays and (w)eeks. must be more than 1 hour")
 	}
 	//Getting number of repeats
 	repeatArg, err := strconv.Atoi(strings.Trim(repeatsRegex.FindString(arguments), " "))
 	if err != nil {
-		return Task{}, errors.New("Error with repeats; Please specify number of times to repeat reminder. If you don't want to repeat, Use 1")
+		return Task{}, errors.New("error with repeats; please specify number of times to repeat reminder. if you don't want to repeat, use 1")
 	}
 	//Next time should be the time given in the same date as today,
 	//Unless time is already in the past, then time should be tomorrow.

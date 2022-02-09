@@ -87,7 +87,7 @@ func getGuilds() {
 
 //Updates guild to new info
 func updateGuild(guildId int) {
-	guild, _ := guilds[guildId]
+	guild := guilds[guildId]
 	_, err := database.Exec(sqlUpdateGuildQuery,
 		guild.AdminRole,
 		guild.UserChannel,
@@ -100,7 +100,7 @@ func updateGuild(guildId int) {
 
 //Create new guild
 func createGuild(guildId int) {
-	guild, _ := guilds[guildId]
+	guild := guilds[guildId]
 	_, err := database.Exec(sqlInsertGuildQuery,
 		guildId,
 		guild.AdminRole,

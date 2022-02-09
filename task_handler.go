@@ -23,7 +23,7 @@ func CheckTasks() {
 
 //Handles a single task
 func HandleTask(t int) {
-	task, _ := tasks[t]
+	task := tasks[t]
 	task = SendTask(task)
 	//If no more repeats, delete task
 	if task.Repeats <= 0 {
