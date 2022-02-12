@@ -39,10 +39,12 @@ func (bot *Bot) Start() {
 	if err != nil {
 		bot.logger.Fatal("[SETUP] Error opening connection,", err)
 	}
+	bot.logger.Println("[SETUP] Now running! Press CTRL+C to exit")
 }
 
 //Stops the bot.
 func (bot *Bot) Stop() {
+	bot.logger.Println("[SETUP] Shutting down")
 	bot.Session.Close()
 }
 

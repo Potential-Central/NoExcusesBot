@@ -5,13 +5,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	bot "github.com/Potential-Central/NoExcusesBot/bot"
+	"github.com/Potential-Central/NoExcusesBot"
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
-	client, _ := bot.MakeBot(os.Getenv("DISCORD_TOKEN"))
+	client, _ := NoExcusesBot.MakeBot(os.Getenv("DISCORD_TOKEN"))
 	client.Start()
 
 	sc := make(chan os.Signal, 1)
