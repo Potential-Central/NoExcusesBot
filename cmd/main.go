@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,6 +13,8 @@ import (
 func main() {
 	godotenv.Load()
 	client, _ := NoExcusesBot.MakeBot(os.Getenv("DISCORD_TOKEN"))
+	fmt.Println(client.Guilds)
+
 	client.Start()
 
 	sc := make(chan os.Signal, 1)
