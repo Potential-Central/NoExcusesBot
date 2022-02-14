@@ -3,6 +3,7 @@ package NoExcusesBot
 import (
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
@@ -16,6 +17,7 @@ type Bot struct {
 	Session  *discordgo.Session
 	Database *bolt.DB
 	Guilds   map[string]Guild
+	Exts     []Extension
 }
 
 // Guild object, implements DataObject
@@ -88,5 +90,25 @@ func (bot *Bot) LoadGuilds() int {
 }
 
 func (bot *Bot) messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	bot.logger.Println("Test")
+	//Ignoring messages sent by self
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
+	//Catching message by prefix
+	if strings.HasPrefix(m.Content, bot.Prefix) {
+		//Searching for commands in all extensions
+		for _, ext := range bot.Exts {
+			//Searching for all commands in each extension
+			for _, cmd := range ext.commands() {
+				if strings.HasPrefix(m.Content, bot.Prefix+cmd.Name) {
+					//If command found, and user has permission, execute it
+					if cmd.HasPermission(s, m) {
+						bot.logger.Printf("[COMND] Proccessing %s from ext %s.", cmd.Name, ext.name())
+						cmd.Execute(s, m)
+						return
+					}
+				}
+			}
+		}
+	}
 }
