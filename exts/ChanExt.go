@@ -21,6 +21,9 @@ func MakeChannelsExt(bot *NoExcusesBot.Bot) {
 	ret.Commands = append(ret.Commands, &NoExcusesBot.Command{
 		Name: "adminchan", HasPermission: ret.adminPerms, Execute: ret.setAdminChannel,
 	})
+	ret.Commands = append(ret.Commands, &NoExcusesBot.Command{
+		Name: "adminrole", HasPermission: ret.adminPerms, Execute: ret.setAdminRole,
+	})
 	bot.Exts = append(bot.Exts, ret)
 	bot.Logger.Printf("[CHANS] Extension loaded")
 }
@@ -107,5 +110,33 @@ func (ext *ChanExt) setAdminChannel(s *discordgo.Session, m *discordgo.MessageCr
 		NoExcusesBot.WriteObject(ext.Bot.Database, guild)
 		s.ChannelMessageSend(m.ChannelID, "This channel is now the admin channel!")
 		ext.Bot.Logger.Printf("[CHANS] Created admin channel in new guild %v to %v", intG, intCh)
+	}
+}
+
+//Setting a role for bot administrators
+func (ext *ChanExt) setAdminRole(s *discordgo.Session, m *discordgo.MessageCreate) {
+	roles := m.MentionRoles
+	intG, _ := strconv.Atoi(m.GuildID)
+	if len(roles) != 1 {
+		s.ChannelMessageSend(m.ChannelID, "Please provide exactly **one** role!")
+		return
+	}
+	intR, _ := strconv.Atoi(roles[0])
+	if guild, ok := ext.Bot.Guilds[m.GuildID]; ok {
+		//If guild already exists, just update the role.
+		guild.AdminRole = intR
+		NoExcusesBot.WriteObject(ext.Bot.Database, guild)
+		s.ChannelMessageSend(m.ChannelID, "Admin role updated!")
+		ext.Bot.Logger.Printf("[CHANS] Updated admin role in guild %v to %v", intG, intR)
+	} else {
+		//If guild doesn't exist, create new guild
+		guild = &NoExcusesBot.Guild{
+			Id:        intG,
+			AdminRole: intR,
+		}
+		ext.Bot.Guilds[m.GuildID] = guild
+		NoExcusesBot.WriteObject(ext.Bot.Database, guild)
+		s.ChannelMessageSend(m.ChannelID, "Admin role updated!")
+		ext.Bot.Logger.Printf("[CHANS] Created admin role in new guild %v to %v", intG, intR)
 	}
 }
