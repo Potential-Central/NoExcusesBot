@@ -5,9 +5,9 @@ import (
 )
 
 type Extension interface {
-	commands() []Command
-	name() string
-	help() string
+	CommandList() []*Command
+	Name() string
+	Help() string
 }
 
 type Command struct {

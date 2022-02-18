@@ -1,19 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/Potential-Central/NoExcusesBot"
+	bot "github.com/Potential-Central/NoExcusesBot"
+	exts "github.com/Potential-Central/NoExcusesBot/exts"
+
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
-	client, _ := NoExcusesBot.MakeBot(os.Getenv("DISCORD_TOKEN"))
-	fmt.Println(client.Guilds)
+	client, _ := bot.MakeBot(os.Getenv("DISCORD_TOKEN"))
+	exts.MakeChannelsExt(client)
 
 	client.Start()
 

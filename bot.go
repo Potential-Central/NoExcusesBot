@@ -13,10 +13,10 @@ import (
 type Bot struct {
 	Prefix   string
 	Token    string
-	logger   *log.Logger
+	Logger   *log.Logger
 	Session  *discordgo.Session
 	Database *bolt.DB
-	Guilds   map[string]Guild
+	Guilds   map[string]*Guild
 	Exts     []Extension
 }
 
@@ -44,8 +44,8 @@ func MakeBot(token string, args ...string) (*Bot, error) {
 	if len(args) >= 1 {
 		prefix = args[0]
 	}
-	ret := &Bot{Prefix: prefix, Token: token}
-	ret.logger = log.Default()
+	ret := &Bot{Prefix: prefix, Token: token, Exts: make([]Extension, 0)}
+	ret.Logger = log.Default()
 	ret.Session, err = discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, err
@@ -64,27 +64,27 @@ func MakeBot(token string, args ...string) (*Bot, error) {
 func (bot *Bot) Start() {
 	err := bot.Session.Open()
 	if err != nil {
-		bot.logger.Fatal("[SETUP] Error opening connection,", err)
+		bot.Logger.Fatal("[SETUP] Error opening connection,", err)
 	}
-	bot.logger.Println("[SETUP] Now running! Press CTRL+C to exit")
+	bot.Logger.Println("[SETUP] Now running! Press CTRL+C to exit")
 }
 
 //Stops the bot.
 func (bot *Bot) Stop() {
-	bot.logger.Println("[SETUP] Shutting down")
+	bot.Logger.Println("[SETUP] Shutting down")
 	bot.Session.Close()
 	bot.Database.Close()
 }
 
 //Loads guilds from database, returns number of guilds
 func (bot *Bot) LoadGuilds() int {
-	bot.Guilds = make(map[string]Guild)
+	bot.Guilds = make(map[string]*Guild)
 	keys := GetKeys(bot.Database, "Guilds")
 	for _, key := range keys {
 		guildId, _ := strconv.Atoi(key)
 		guild := &Guild{Id: guildId}
 		ReadObject(bot.Database, guild)
-		bot.Guilds[key] = *guild
+		bot.Guilds[key] = guild
 	}
 	return len(keys)
 }
@@ -99,11 +99,11 @@ func (bot *Bot) messageHandler(s *discordgo.Session, m *discordgo.MessageCreate)
 		//Searching for commands in all extensions
 		for _, ext := range bot.Exts {
 			//Searching for all commands in each extension
-			for _, cmd := range ext.commands() {
+			for _, cmd := range ext.CommandList() {
 				if strings.HasPrefix(m.Content, bot.Prefix+cmd.Name) {
 					//If command found, and user has permission, execute it
 					if cmd.HasPermission(s, m) {
-						bot.logger.Printf("[COMND] Proccessing %s from ext %s.", cmd.Name, ext.name())
+						bot.Logger.Printf("[COMND] Proccessing %s from ext %s.", cmd.Name, ext.Name())
 						cmd.Execute(s, m)
 						return
 					}
