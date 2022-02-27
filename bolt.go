@@ -8,16 +8,16 @@ import (
 
 //Interface for a database object
 type DataObject interface {
-	bucket() string
-	primaryKey() string
+	Bucket() string
+	PrimaryKey() string
 }
 
 //Writes an object to the database
 func WriteObject(db *bolt.DB, object DataObject) error {
 	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(object.bucket()))
+		b := tx.Bucket([]byte(object.Bucket()))
 		encoded, _ := json.Marshal(object)
-		err := b.Put([]byte(object.primaryKey()), encoded)
+		err := b.Put([]byte(object.PrimaryKey()), encoded)
 		return err
 	})
 	return err
@@ -26,8 +26,8 @@ func WriteObject(db *bolt.DB, object DataObject) error {
 //Reads an object from the database
 func ReadObject(db *bolt.DB, object DataObject) error {
 	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(object.bucket()))
-		v := b.Get([]byte(object.primaryKey()))
+		b := tx.Bucket([]byte(object.Bucket()))
+		v := b.Get([]byte(object.PrimaryKey()))
 		err := json.Unmarshal(v, &object)
 		return err
 	})

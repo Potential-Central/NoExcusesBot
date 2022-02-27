@@ -15,6 +15,7 @@ func main() {
 	godotenv.Load()
 	client, _ := bot.MakeBot(os.Getenv("DISCORD_TOKEN"))
 	exts.MakeChannelsExt(client)
+	exts.MakeTasksExt(client)
 
 	client.Start()
 

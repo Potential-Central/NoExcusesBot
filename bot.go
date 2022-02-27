@@ -28,11 +28,11 @@ type Guild struct {
 	AdminChannel int `json:"adminChannel,omitempty"`
 }
 
-func (guild Guild) bucket() string {
+func (guild Guild) Bucket() string {
 	return "Guilds"
 }
 
-func (guild Guild) primaryKey() string {
+func (guild Guild) PrimaryKey() string {
 	return strconv.Itoa(guild.Id)
 }
 
@@ -50,7 +50,7 @@ func MakeBot(token string, args ...string) (*Bot, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret.Database, err = CreateDB("Guilds")
+	ret.Database, err = CreateDB("Guilds", "Tasks")
 	if err != nil {
 		return nil, err
 	}
