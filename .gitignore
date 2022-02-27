@@ -14,3 +14,5 @@
 .env
 *.log
 *.db*
+cmd/*
+!cmd/*.go
